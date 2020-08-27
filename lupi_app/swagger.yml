@@ -1,0 +1,155 @@
+swagger: "2.0"
+info:
+  description: REST API for LUPI
+  version: "1.0.0"
+  title: Least Unique Positive Integer
+consumes:
+  - application/json
+produces:
+  - application/json
+
+basePath: /api
+
+# Paths supported by the server application
+paths:
+  /start:
+    post:
+      operationId: lupi_api.start
+      tags:
+        - LUPI
+      summary: Start a new round
+      responses:
+        201:
+          description: Successfully started a new round
+          schema:
+            properties:
+              round_id:
+                type: integer
+        409:
+          description: There is active round
+  /stop:
+    put:
+      operationId: lupi_api.stop
+      tags:
+        - LUPI
+      summary: Stop a round
+      parameters:
+        - name: round_id
+          in: body
+          description: ID of the round
+          required: True
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successfully stopped the round.
+          schema:
+            properties:
+              winner:
+                type: string
+              number:
+                type: integer
+        404:
+          description: Active round not found for the given ID.
+  /vote:
+    post:
+      operationId: lupi_api.vote
+      tags:
+        - LUPI
+      summary: Send a vote
+      parameters:
+        - name: vote
+          in: body
+          description: The name of the player and a positive integer
+          required: True
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the player
+              number:
+                type: integer
+                description: The player's number
+      responses:
+        200:
+          description: Successfully stored the vote
+          schema:
+            properties:
+              round_id:
+                type: integer
+        404:
+          description: No active round.
+        412:
+          description: Invalid parameter.
+        500:
+          description: Internal server error.
+  /result/{round_id}:
+    get:
+      operationId: lupi_api.get_result
+      tags:
+        - LUPI
+      summary: Returns the result of a round
+      parameters:
+        - name: round_id
+          in: path
+          description: ID of the round
+          type: integer
+          required: True
+      responses:
+        200:
+          description: Successfully returned the result
+          schema:
+            properties:
+              winner:
+                type: string
+              number:
+                type: integer
+        404:
+          description: Round result is not available for given ID.
+  /rounds:
+    get:
+      operationId: lupi_api.get_rounds
+      tags:
+        - LUPI
+      summary: Listing all rounds with IDs and start date, end date, number of participants
+      responses:
+        200:
+          description: Successfully read round list
+          schema:
+            type: array
+            items:
+              properties:
+                round_id:
+                  type: integer
+                start_timestamp:
+                  type: string
+                end_timestamp:
+                  type: string
+                num_of_participants:
+                  type: integer
+  /stat/{round_id}:
+    get:
+      operationId: lupi_api.get_stat
+      tags:
+        - LUPI
+      summary: Querying the statistics of a round (distribution of votes from 1 to the max number voted for in that round)
+      parameters:
+        - name: round_id
+          in: path
+          description: ID of the round
+          type: integer
+          required: True
+      responses:
+        200:
+          description: Successfully returned the statistics
+          schema:
+            type: array
+            items:
+              properties:
+                number:
+                  type: integer
+                count:
+                  type: integer
+        404:
+          description: Round not found for the given ID.

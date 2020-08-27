@@ -1,0 +1,12 @@
+.table-view, .response, .lupi-form {
+    margin-top: 20px;
+    clear: both;
+}
+
+.lupi-form input {
+    margin-right: 20px;
+}
+
+.lupi-form .field {
+    float: left;
+}
